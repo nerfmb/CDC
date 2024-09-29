@@ -1,0 +1,107 @@
+---
+title: "stat_analysis"
+output: pdf_document
+date: "2024-09-29"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+```
+
+
+
+```{r cars}
+data <- read_csv('C:\\Users\\nerfm\\Documents\\Python Scripts\\CDC\\FINAL_sentiment_merged.csv')
+```
+
+
+```{r pressure, echo=FALSE}
+qqnorm(data$sentiment, pch = 1, frame = FALSE)
+qqline(data$sentiment, col = "steelblue", lwd = 2)
+```
+
+```{r}
+kruskal.test(sentiment ~ factor(location), data = data)
+```
+
+```{r}
+p <- data %>%
+  ggplot( aes(x=data$sentiment, fill=factor(data$location))) +
+    geom_histogram( color="#e9ecef", alpha=0.6, position = 'identity') +
+    scale_fill_manual(values=c("#69b3a2", "#404080",'red','yellow','gray','brown','magenta','purple')) +
+    labs(fill="")
+p
+```
+```{r}
+rome <- data %>% filter(location == 'rome')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'amsterdam')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'paris')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'tuscany')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'barcelona')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'berlin')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'dubai')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+```{r}
+rome <- data %>% filter(location == 'london')
+hist(rome$sentiment)
+mean(rome$sentiment)
+```
+
+```{r}
+library(dunn.test)
+dunn.sentiment <- dunn.test(data$sentiment,factor(data$location),kw = T, method = 'bonferroni')
+```
+
+```{r}
+library(fpp3)
+data <- data %>% mutate(date = as.Date(time,format = "%m/%d/%Y"))
+data <- data %>% mutate(yearmonth = yearmonth(date))
+```
+
+```{r}
+data$sentiment_cat <- cut(data$sentiment,
+                       breaks=c(-1, -.1,.1, 1),
+                       labels=c('Negative', 'Neutral', 'Positive'))
+```
+
+```{r}
+hist(data$`temperature_2m_mean (°F)`)
+library(car)
+library(PMCMRplus)
+leveneTest(data$`temperature_2m_mean (°F)` ~ data$sentiment_cat:factor(data$location))
+temp_by_sentiment <- aov(data$`temperature_2m_mean (°F)` ~ data$sentiment_cat + factor(data$location))
+final <- gamesHowellTest(temp_by_sentiment)
+summary(final)
+```
+
+
+
+
+
